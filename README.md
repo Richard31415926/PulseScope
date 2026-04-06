@@ -1,8 +1,23 @@
 # PulseScope
 
-PulseScope is a premium, frontend-only observability product built to feel like a real internal platform rather than a dashboard starter kit. It focuses on trace-driven investigation, dense operational UX, and the kind of polish expected from modern tools like Vercel, Linear, Datadog, and Grafana.
+![PulseScope traces explorer cover](./docs/assets/pulsescope-cover.png)
+
+Premium frontend-only observability product with trace-first UX, URL-synced investigations, keyboard-driven workflows, and portfolio-grade polish.
+
+PulseScope is built to feel like a real internal platform rather than a dashboard starter kit. It focuses on trace-driven investigation, dense operational UX, and the kind of polish expected from modern tools like Vercel, Linear, Datadog, and Grafana.
 
 This repository is intentionally portfolio-grade. The goal is not to prove that a dashboard can be assembled quickly; it is to show how a serious frontend engineer structures a complex product surface, manages shared state, designs reusable primitives, and pushes quality across interaction design, testing, accessibility, and performance.
+
+## Showcase
+
+The cover image above is the flagship `Traces` surface in its latency-war-room configuration:
+
+- dense but readable trace table
+- right-side preview drawer
+- URL-backed filters and sort state
+- premium dark visual hierarchy designed for screenshot-level presentation
+
+If you want the best first impression when reviewing the project locally, start with `/traces`.
 
 ## What The Product Is
 
