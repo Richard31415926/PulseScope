@@ -20,7 +20,7 @@ import type {
 } from "@/types/pulsescope";
 
 const columns =
-  "minmax(0,2.35fr) minmax(0,1.15fr) minmax(0,0.92fr) minmax(0,0.85fr) minmax(0,0.82fr) minmax(0,0.8fr)";
+  "minmax(330px,2.75fr) minmax(188px,1.15fr) minmax(188px,1fr) minmax(156px,0.9fr) minmax(136px,0.82fr) minmax(176px,0.9fr)";
 
 export function TracesTable({
   activeTraceId,
@@ -45,7 +45,7 @@ export function TracesTable({
       initial={{ opacity: 0, y: 14 }}
       transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
     >
-      <DataTable className="min-w-[1040px]">
+      <DataTable className="min-w-[1140px]">
         <DataTableHeader columns={columns}>
           <DataTableHeaderCell>Trace</DataTableHeaderCell>
           <DataTableHeaderCell>
@@ -115,8 +115,8 @@ export function TracesTable({
                   <div className="flex items-start gap-3">
                     <div
                       className={cn(
-                        "mt-1 flex size-9 shrink-0 items-center justify-center rounded-[14px] border border-white/10 bg-white/[0.05] text-[11px] font-semibold tracking-[0.18em] text-white/34 uppercase transition",
-                        active && "border-white/16 bg-white/[0.08] text-white/70",
+                        "mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-[14px] border text-[11px] font-semibold tracking-[0.18em] uppercase transition",
+                        getOrdinalClass(trace.status, active),
                       )}
                     >
                       {String(index + 1).padStart(2, "0")}
@@ -126,12 +126,14 @@ export function TracesTable({
                         <span className="rounded-full border border-white/10 px-2 py-1 text-[11px] tracking-[0.16em] text-white/40 uppercase">
                           {trace.method}
                         </span>
-                        <span className="text-xs text-white/36">{trace.httpStatus}</span>
-                        <span className="text-xs text-white/32">{trace.region}</span>
+                        <span className="text-[11px] font-medium text-white/38">{trace.httpStatus}</span>
+                        <span className="text-[11px] tracking-[0.12em] text-white/28 uppercase">{trace.region}</span>
                       </div>
-                      <div className="truncate font-medium text-white">{trace.endpoint}</div>
+                      <div className="truncate text-[1.03rem] font-medium tracking-[-0.02em] text-white">
+                        {trace.endpoint}
+                      </div>
                       <div className="mt-1 flex items-center gap-2">
-                        <span className="truncate text-sm text-white/40">{trace.id}</span>
+                        <span className="truncate font-mono text-[12px] text-white/36">{trace.id}</span>
                         <ArrowUpRight
                           className={cn(
                             "size-3.5 shrink-0 text-white/0 transition group-hover:text-white/36",
@@ -146,14 +148,19 @@ export function TracesTable({
                 <DataTableCell>
                   <div className="space-y-1">
                     <div className="truncate font-medium text-white">{trace.service}</div>
-                    <div className="truncate text-sm text-white/40">{trace.operation}</div>
+                    <div className="truncate text-sm text-white/36">{trace.operation}</div>
                   </div>
                 </DataTableCell>
 
                 <DataTableCell>
                   <div className="space-y-2">
-                    <StatusPill label={trace.status} />
-                    <div className="truncate text-sm text-white/42">{trace.primaryIssue}</div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <StatusPill label={trace.status} />
+                      <span className="truncate text-[10px] font-semibold tracking-[0.16em] text-white/28 uppercase">
+                        {trace.primarySpan}
+                      </span>
+                    </div>
+                    <div className="line-clamp-2 text-sm leading-5 text-white/42">{trace.primaryIssue}</div>
                   </div>
                 </DataTableCell>
 
@@ -163,7 +170,7 @@ export function TracesTable({
                       {formatDuration(trace.durationMs)}
                     </div>
                     <div className="text-sm text-white/38">
-                      DB {formatDuration(trace.databaseTimeMs)}
+                      DB {formatDuration(trace.databaseTimeMs)} · Net {formatDuration(trace.networkTimeMs)}
                     </div>
                   </div>
                 </DataTableCell>
@@ -171,14 +178,16 @@ export function TracesTable({
                 <DataTableCell>
                   <div className="space-y-1 text-sm">
                     <div className="font-medium text-white">{trace.spanCount} spans</div>
-                    <div className="text-white/38">{trace.correlatedLogs} correlated logs</div>
+                    <div className="text-white/38">
+                      {trace.servicePath.length} hops · {trace.correlatedLogs} logs
+                    </div>
                   </div>
                 </DataTableCell>
 
                 <DataTableCell>
                   <div className="space-y-1 text-sm">
                     <div className="font-medium text-white">{trace.startedAt}</div>
-                    <div className="text-white/38">{trace.userImpact}</div>
+                    <div className="line-clamp-1 leading-5 text-white/38">{trace.userImpact}</div>
                   </div>
                 </DataTableCell>
               </DataTableRow>
@@ -188,4 +197,22 @@ export function TracesTable({
       </DataTable>
     </motion.div>
   );
+}
+
+function getOrdinalClass(status: TraceExplorerRow["status"], active: boolean) {
+  if (status === "error") {
+    return active
+      ? "border-danger/28 bg-danger/12 text-danger"
+      : "border-danger/18 bg-danger/8 text-danger/80";
+  }
+
+  if (status === "slow") {
+    return active
+      ? "border-warning/28 bg-warning/12 text-warning"
+      : "border-warning/18 bg-warning/8 text-warning/80";
+  }
+
+  return active
+    ? "border-info/24 bg-info/12 text-info"
+    : "border-white/10 bg-white/[0.05] text-white/34";
 }

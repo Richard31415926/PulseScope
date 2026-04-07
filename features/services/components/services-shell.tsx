@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowUpRight, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, ShieldCheck, Orbit, Siren, Waypoints } from "lucide-react";
 import { ErrorState } from "@/components/shell/error-state";
 import { HealthIndicator } from "@/components/shell/health-indicator";
 import { PanelSkeleton } from "@/components/shell/panel-skeleton";
@@ -85,10 +85,11 @@ export function ServicesShell() {
   const activeIncidents = incidents.filter((incident) => incident.status !== "resolved");
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageHeader
         actions={<Button variant="default">Dependency review</Button>}
-        description="A premium service posture view built as a hybrid: featured dossiers for high-risk services, a dense service ledger for scanning, and dependency context that keeps topology visible without overwhelming the page."
+        density="tight"
+        description="A service posture workbench for dependency risk, degraded ownership, and fast pivots into traces, logs, and incident context."
         eyebrow="Service Map"
         meta={
           <>
@@ -104,56 +105,95 @@ export function ServicesShell() {
       />
 
       <div className="grid gap-4 xl:grid-cols-4">
-        <SummaryCard label="Monitored services" value={`${services.length}`} />
-        <SummaryCard label="Critical attention" value={`${criticalCount}`} />
-        <SummaryCard label="Degraded services" value={`${degradedCount}`} />
-        <SummaryCard label="Avg availability" value={formatPercentage(averageAvailability, 2)} />
+        <SummaryCard icon={<Orbit className="size-4" />} label="Monitored services" supporting="Services in current workspace" value={`${services.length}`} />
+        <SummaryCard icon={<Siren className="size-4" />} label="Critical attention" supporting="Services in critical state" value={`${criticalCount}`} />
+        <SummaryCard icon={<Waypoints className="size-4" />} label="Degraded services" supporting="Latency or error pressure" value={`${degradedCount}`} />
+        <SummaryCard icon={<ShieldCheck className="size-4" />} label="Avg availability" supporting="Synthetic fleet posture" value={formatPercentage(averageAvailability, 2)} />
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[1.18fr_0.82fr]">
+      <div className="grid gap-6 2xl:grid-cols-[minmax(0,1.12fr)_390px]">
         <div className="space-y-4">
-          <div className="grid gap-4 xl:grid-cols-3">
-            {featuredServices.map((service) => (
-              <SurfacePanel
-                action={<HealthIndicator status={service.status} />}
-                className="h-full"
-                description={service.description}
-                key={service.id}
-                title={service.name}
-              >
-                <div className="mb-4 flex flex-wrap items-center gap-2">
-                  <StatusPill label={service.tier} />
-                  <div className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs text-white/56">
-                    {service.owner}
+          <SurfacePanel
+            description="Priority services condense the highest-risk nodes into compact dossiers before you drop into the full ledger."
+            title="Priority services"
+          >
+            <div className="grid gap-4 xl:grid-cols-3">
+              {featuredServices.map((service) => (
+                <SurfacePanel
+                  action={<HealthIndicator status={service.status} />}
+                  className="h-full border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.015))] p-4 shadow-none"
+                  description={service.description}
+                  key={service.id}
+                  title={service.name}
+                >
+                  <div className="mb-4 flex flex-wrap items-center gap-2">
+                    <StatusPill label={service.tier} />
+                    <div className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs text-white/56">
+                      {service.owner}
+                    </div>
                   </div>
-                </div>
 
-                <div className="grid gap-3 text-sm sm:grid-cols-2">
-                  <MetricCell label="Latency" value={service.latency} />
-                  <MetricCell label="Throughput" value={service.throughput} />
-                  <MetricCell label="Error rate" value={service.errorRate} />
-                  <MetricCell label="Availability" value={service.availability} />
-                </div>
+                  <div className="grid gap-3 text-sm sm:grid-cols-2">
+                    <MetricCell label="Latency" value={service.latency} />
+                    <MetricCell label="Throughput" value={service.throughput} />
+                    <MetricCell label="Error rate" value={service.errorRate} />
+                    <MetricCell label="Deps" value={`${service.dependencies.length}`} />
+                  </div>
 
-                <Button asChild className="mt-4 w-full justify-between" size="sm" variant="secondary">
-                  <Link
-                    aria-label={`Open featured service ${service.name}`}
-                    href={buildWorkspaceHref(`/services/${service.id}`, workspaceState)}
-                  >
-                    Open service
-                    <ArrowUpRight className="size-4" />
-                  </Link>
-                </Button>
-              </SurfacePanel>
-            ))}
-          </div>
+                  <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                    <Button asChild className="justify-between" size="sm" variant="ghost">
+                      <Link
+                        aria-label={`Open traces for ${service.name}`}
+                        href={buildWorkspaceHref("/traces", workspaceState, { service: service.id })}
+                      >
+                        Traces
+                        <ArrowUpRight className="size-4" />
+                      </Link>
+                    </Button>
+                    <Button asChild className="justify-between" size="sm" variant="ghost">
+                      <Link
+                        aria-label={`Open logs for ${service.name}`}
+                        href={buildWorkspaceHref("/logs", workspaceState, { logService: service.id })}
+                      >
+                        Logs
+                        <ArrowUpRight className="size-4" />
+                      </Link>
+                    </Button>
+                    <Button asChild className="justify-between" size="sm" variant="ghost">
+                      <Link
+                        aria-label={`Open incidents for ${service.name}`}
+                        href={buildWorkspaceHref(
+                          "/incidents",
+                          workspaceState,
+                          service.incidents[0] ? { incident: service.incidents[0] } : undefined,
+                        )}
+                      >
+                        Incidents
+                        <ArrowUpRight className="size-4" />
+                      </Link>
+                    </Button>
+                  </div>
+
+                  <Button asChild className="mt-2 w-full justify-between" size="sm" variant="secondary">
+                    <Link
+                      aria-label={`Open featured service ${service.name}`}
+                      href={buildWorkspaceHref(`/services/${service.id}`, workspaceState)}
+                    >
+                      Open service
+                      <ArrowUpRight className="size-4" />
+                    </Link>
+                  </Button>
+                </SurfacePanel>
+              ))}
+            </div>
+          </SurfacePanel>
 
           <SurfacePanel
-            className="overflow-hidden p-0"
-            description="The ledger stays dense and readable by keeping only the high-value operational fields in view while actions remain one click away."
+            className="overflow-hidden"
+            description="The ledger stays dense and readable by keeping high-value operational fields visible while actions remain one click away."
             title="Service ledger"
           >
-            <div className="grid gap-3 border-b border-white/8 bg-white/[0.04] px-5 py-3 text-[11px] font-semibold tracking-[0.18em] text-white/34 uppercase" style={{ gridTemplateColumns: rowColumns }}>
+            <div className="grid gap-3 border-b border-white/8 bg-[rgba(25,30,40,0.86)] px-5 py-3 text-[11px] font-semibold tracking-[0.18em] text-white/34 uppercase backdrop-blur-xl" style={{ gridTemplateColumns: rowColumns }}>
               <div>Service</div>
               <div>Owner</div>
               <div>Latency</div>
@@ -162,10 +202,10 @@ export function ServicesShell() {
               <div />
             </div>
 
-            <div className="p-3">
+            <div className="p-2">
               {services.map((service) => (
                 <div
-                  className="grid items-center gap-3 rounded-[22px] border border-transparent px-3 py-3 transition hover:border-white/10 hover:bg-white/[0.03]"
+                  className="grid items-center gap-3 rounded-[22px] border border-transparent px-4 py-3 transition hover:border-white/10 hover:bg-[linear-gradient(90deg,rgba(77,122,255,0.06),rgba(255,255,255,0.02))]"
                   key={service.id}
                   style={{ gridTemplateColumns: rowColumns }}
                 >
@@ -200,20 +240,20 @@ export function ServicesShell() {
 
         <div className="space-y-4">
           <SurfacePanel
-            description="A simplified dependency panorama keeps the system shape visible without turning the overview into a graphing exercise."
+            description="A simplified dependency panorama keeps the system shape visible without turning the service overview into a graphing exercise."
             title="Dependency panorama"
           >
             <ServiceDependencyPanorama services={services} />
           </SurfacePanel>
 
           <SurfacePanel
-            description="Recent incident context stays adjacent to the service ledger so health and response history can be read together."
-            title="Recent incident history"
+            description="Recent incident context stays adjacent to the ledger so health, ownership, and response history can be read together."
+            title="Incident pulse"
           >
             <div className="space-y-3">
               {incidents.slice(0, 4).map((incident) => (
                 <div
-                  className="rounded-[24px] border border-white/8 bg-white/[0.03] p-4"
+                  className="rounded-[24px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.015))] p-4"
                   key={incident.id}
                 >
                   <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -233,7 +273,7 @@ export function ServicesShell() {
                     ))}
                   </div>
                   <Button asChild className="mt-4 justify-between" size="sm" variant="ghost">
-                    <Link href={buildWorkspaceHref("/incidents", workspaceState)}>
+                    <Link href={buildWorkspaceHref("/incidents", workspaceState, { incident: incident.id })}>
                       Open incidents
                       <ArrowUpRight className="size-4" />
                     </Link>
@@ -248,14 +288,25 @@ export function ServicesShell() {
   );
 }
 
-function SummaryCard({ label, value }: { label: string; value: string }) {
+function SummaryCard({
+  icon,
+  label,
+  supporting,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  supporting: string;
+  value: string;
+}) {
   return (
     <div className="surface-panel rounded-[24px] border border-white/10 p-4">
-      <div className="mb-3 flex items-center gap-2 text-sm text-white/40">
-        <ShieldCheck className="size-4 text-white/32" />
+      <div className="mb-2 flex items-center gap-2 text-sm text-white/40">
+        <span className="text-white/32">{icon}</span>
         <span>{label}</span>
       </div>
-      <div className="font-display text-3xl font-semibold tracking-[-0.04em] text-white">{value}</div>
+      <div className="font-display text-[2rem] font-semibold tracking-[-0.04em] text-white">{value}</div>
+      <div className="mt-1 text-sm text-white/42">{supporting}</div>
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 ![PulseScope traces explorer cover](./docs/assets/pulsescope-cover.png)
 
-Premium frontend-only observability product with trace-first UX, URL-synced investigations, keyboard-driven workflows, and portfolio-grade polish.
+Calm, investigation-first observability workbench with trace-first UX, correlated logs and incidents, URL-synced state, and portfolio-grade frontend polish.
 
 PulseScope is built to feel like a real internal platform rather than a dashboard starter kit. It focuses on trace-driven investigation, dense operational UX, and the kind of polish expected from modern tools like Vercel, Linear, Datadog, and Grafana.
 
@@ -10,14 +10,26 @@ This repository is intentionally portfolio-grade. The goal is not to prove that 
 
 ## Showcase
 
-The cover image above is the flagship `Traces` surface in its latency-war-room configuration:
+The cover image above is the flagship `Traces` surface in its latency-war-room configuration. The rest of the product is designed to support the investigation flow around it: overview -> anomaly -> service -> trace -> logs -> incident context.
+
+| Trace Explorer | Trace Detail |
+| --- | --- |
+| ![PulseScope Trace Explorer](./docs/assets/pulsescope-cover.png) | ![PulseScope Trace Detail](./docs/assets/pulsescope-trace-detail.png) |
+| Overview | Logs |
+| ![PulseScope Overview](./docs/assets/pulsescope-overview.png) | ![PulseScope Logs Explorer](./docs/assets/pulsescope-logs.png) |
+
+If you want the fastest review path locally, use this order:
+
+- `/traces` for the flagship scanning surface
+- `/traces/[traceId]` for the waterfall and investigation rail
+- `/overview` for anomaly triage and cross-signal launch points
+- `/logs` for dense virtualized stream behavior
+- `/incidents` for the response-desk workflow
 
 - dense but readable trace table
 - right-side preview drawer
 - URL-backed filters and sort state
 - premium dark visual hierarchy designed for screenshot-level presentation
-
-If you want the best first impression when reviewing the project locally, start with `/traces`.
 
 ## What The Product Is
 
@@ -70,7 +82,7 @@ npm install
 npm run dev
 ```
 
-Open [http://127.0.0.1:3000](http://127.0.0.1:3000).
+Open [http://localhost:3000](http://localhost:3000).
 
 Useful scripts:
 

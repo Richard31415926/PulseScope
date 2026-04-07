@@ -14,7 +14,7 @@ import {
 import { cn, formatDuration } from "@/lib/utils";
 import type { TraceDetail, TraceSpan, TraceSpanKind } from "@/types/pulsescope";
 
-const columns = "minmax(0,320px) minmax(780px,1fr) 96px";
+const columns = "minmax(0,334px) minmax(780px,1fr) 112px";
 
 const kindCopy: Record<TraceSpanKind, string> = {
   entry: "entry",
@@ -97,7 +97,12 @@ export function TraceWaterfallTimeline({
                   type="button"
                   style={{ gridTemplateColumns: columns }}
                 >
-                  <div className="min-w-0">
+                  <div
+                    className={cn(
+                      "min-w-0 rounded-[18px] px-3 py-2 transition",
+                      selected ? "bg-white/[0.04]" : "group-hover:bg-white/[0.02]",
+                    )}
+                  >
                     <div
                       className="flex min-w-0 items-start gap-3"
                       style={{ paddingLeft: `${span.depth * 18}px` }}
@@ -106,7 +111,7 @@ export function TraceWaterfallTimeline({
                       <div className="min-w-0">
                         <div className="mb-1 flex flex-wrap items-center gap-2">
                           <Badge variant={selected ? "info" : "neutral"}>{kindCopy[span.kind]}</Badge>
-                          {isPrimary ? <Badge variant="warning">focus</Badge> : null}
+                          {isPrimary ? <Badge variant="warning">critical path</Badge> : null}
                         </div>
                         <div className="truncate font-medium text-white">{span.name}</div>
                         <div className="mt-1 flex items-center gap-2 text-sm text-white/40">
@@ -173,7 +178,7 @@ export function TraceWaterfallTimeline({
                       {formatDuration(span.durationMs)}
                     </div>
                     <div className="text-xs text-white/34">
-                      +{formatDuration(span.offsetMs)}
+                      self {formatDuration(span.selfTimeMs)}
                     </div>
                   </div>
                 </motion.button>
@@ -225,17 +230,17 @@ function getKindIcon(kind: TraceSpanKind) {
 function getBarClass(status: TraceSpan["status"], selected: boolean) {
   if (status === "error") {
     return selected
-      ? "border-danger/55 bg-[linear-gradient(90deg,rgba(244,96,96,0.85),rgba(255,157,78,0.46))]"
-      : "border-danger/40 bg-[linear-gradient(90deg,rgba(244,96,96,0.72),rgba(255,157,78,0.34))]";
+      ? "border-danger/55 bg-[linear-gradient(90deg,rgba(244,96,96,0.88),rgba(255,157,78,0.48))]"
+      : "border-danger/40 bg-[linear-gradient(90deg,rgba(244,96,96,0.74),rgba(255,157,78,0.34))]";
   }
 
   if (status === "slow") {
     return selected
-      ? "border-warning/55 bg-[linear-gradient(90deg,rgba(245,189,92,0.85),rgba(122,154,255,0.38))]"
-      : "border-warning/36 bg-[linear-gradient(90deg,rgba(245,189,92,0.72),rgba(122,154,255,0.24))]";
+      ? "border-warning/55 bg-[linear-gradient(90deg,rgba(245,189,92,0.88),rgba(122,154,255,0.4))]"
+      : "border-warning/36 bg-[linear-gradient(90deg,rgba(245,189,92,0.74),rgba(122,154,255,0.24))]";
   }
 
   return selected
-    ? "border-info/45 bg-[linear-gradient(90deg,rgba(110,145,255,0.85),rgba(77,190,255,0.34))]"
-    : "border-info/28 bg-[linear-gradient(90deg,rgba(110,145,255,0.68),rgba(77,190,255,0.22))]";
+    ? "border-info/45 bg-[linear-gradient(90deg,rgba(110,145,255,0.88),rgba(77,190,255,0.36))]"
+    : "border-info/28 bg-[linear-gradient(90deg,rgba(110,145,255,0.7),rgba(77,190,255,0.22))]";
 }

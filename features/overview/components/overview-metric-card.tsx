@@ -83,31 +83,38 @@ export function OverviewMetricCard({
   return (
     <motion.article
       animate={{ opacity: 1, y: 0 }}
-      className="surface-panel group rounded-[28px] border border-white/10 p-5 backdrop-blur-xl"
+      className="surface-panel group min-w-0 rounded-[28px] border border-white/10 p-4.5 backdrop-blur-xl"
       initial={{ opacity: 0, y: 14 }}
       transition={{ delay: index * 0.035, duration: 0.24, ease: [0.2, 0.8, 0.2, 1] }}
     >
-      <div className="mb-5 flex items-start justify-between gap-4">
-        <div>
-          <div className="text-sm text-white/46">{metric.label}</div>
-          <div className="mt-3 font-display text-3xl font-semibold tracking-[-0.04em] text-white">
+      <div className="mb-4 flex min-w-0 items-start justify-between gap-4">
+        <div className="min-w-0">
+          <div className="text-[11px] font-semibold tracking-[0.16em] text-white/36 uppercase">
+            {metric.label}
+          </div>
+          <div className="mt-2 font-display text-[2.05rem] font-semibold tracking-[-0.05em] text-white">
             {metric.value}
           </div>
         </div>
-        <div className={cn("inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium", toneClasses)}>
+        <div
+          className={cn(
+            "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
+            toneClasses,
+          )}
+        >
           {icon}
           <span>{metric.delta}</span>
         </div>
       </div>
 
-      <div className="mb-4 overflow-hidden rounded-[22px] border border-white/8 bg-black/14 px-3 pt-3">
+      <div className="mb-3 overflow-hidden rounded-[22px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(0,0,0,0.04))] px-3 pt-3">
         <Sparkline points={metric.sparkline} strokeClassName={sparklineClasses} />
       </div>
 
-      <div className="space-y-2">
-        <p className="text-sm leading-6 text-white/56">{metric.context}</p>
-        <div className="text-xs font-medium tracking-[0.14em] text-white/34 uppercase">
-          {metric.footnote}
+      <div className="space-y-3">
+        <p className="min-h-[4rem] text-sm leading-6 text-white/56">{metric.context}</p>
+        <div className="inline-flex max-w-full items-center rounded-full border border-white/10 bg-black/14 px-3 py-1.5 text-[11px] font-medium tracking-[0.14em] text-white/40 uppercase">
+          <span className="truncate">{metric.footnote}</span>
         </div>
       </div>
     </motion.article>

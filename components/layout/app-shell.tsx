@@ -18,7 +18,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </a>
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(88,110,255,0.11),transparent_24%),radial-gradient(circle_at_70%_20%,rgba(45,172,255,0.08),transparent_18%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_0%,rgba(86,142,255,0.1),transparent_24%),radial-gradient(circle_at_78%_12%,rgba(44,191,255,0.07),transparent_18%),radial-gradient(circle_at_82%_100%,rgba(255,182,95,0.04),transparent_20%)]"
       />
       <div className="relative flex min-h-screen">
         <AppSidebar />
@@ -26,7 +26,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <AppTopbar />
           <PageTransition>
             <main
-              className="mx-auto flex min-h-[calc(100vh-81px)] w-full max-w-[1700px] flex-col px-4 py-6 lg:px-8 lg:py-8"
+              className="mx-auto flex min-h-[calc(100vh-74px)] w-full max-w-[1720px] flex-col px-4 py-4 lg:px-8 lg:py-6"
               id="workspace-content"
               tabIndex={-1}
             >

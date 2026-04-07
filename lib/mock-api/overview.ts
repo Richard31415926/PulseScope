@@ -321,8 +321,8 @@ function buildMetrics(
       value: `${latest.latencyP95}ms`,
       delta: deltaLabel(latest.latencyP95, previous.latencyP95, "ms"),
       tone: metricTone(latest.latencyP95, previous.latencyP95, true),
-      context: "Customer-facing request latency across traced services.",
-      footnote: "Target < 220ms",
+      context: "Checkout and order reads are the first customer-facing paths drifting above latency budget.",
+      footnote: "3 services above budget",
       sparkline: timeline.map((point) => point.latencyP95),
     },
     {
@@ -331,8 +331,8 @@ function buildMetrics(
       value: `${latest.latencyP99}ms`,
       delta: deltaLabel(latest.latencyP99, previous.latencyP99, "ms"),
       tone: metricTone(latest.latencyP99, previous.latencyP99, true),
-      context: "Tail latency pressure on the slowest percentile.",
-      footnote: "Tail amplified by storage fan-out",
+      context: "The slow tail is being stretched by write-heavy billing and storage fan-out paths.",
+      footnote: "tail risk centered on billing-core",
       sparkline: timeline.map((point) => point.latencyP99),
     },
     {
@@ -341,8 +341,8 @@ function buildMetrics(
       value: `${formatCompactNumber(latest.throughput)} rpm`,
       delta: deltaLabel(latest.throughput / 1000, previous.throughput / 1000, "k"),
       tone: metricTone(latest.throughput, previous.throughput),
-      context: "Requests processed per minute in the active window.",
-      footnote: "Across ingress, API, and event pipelines",
+      context: "Request volume is elevated but not anomalous enough to explain the current latency pressure alone.",
+      footnote: "volume steady across ingress + api",
       sparkline: timeline.map((point) => point.throughput),
     },
     {
@@ -351,8 +351,8 @@ function buildMetrics(
       value: formatPercentage(latest.errorRate),
       delta: deltaLabel(latest.errorRate, previous.errorRate, "%"),
       tone: metricTone(latest.errorRate, previous.errorRate, true),
-      context: "Rolling request failure rate across critical surfaces.",
-      footnote: "Budget threshold 0.50%",
+      context: "Failures are clustering around payment confirmation and ingest retry paths.",
+      footnote: "2 endpoints over error budget",
       sparkline: timeline.map((point) => point.errorRate),
     },
     {
@@ -361,8 +361,8 @@ function buildMetrics(
       value: formatPercentage(availability, 3),
       delta: deltaLabel(availability, availability - 0.012, "%"),
       tone: "positive",
-      context: "Synthetic availability projection across public endpoints.",
-      footnote: "SLO target 99.95%",
+      context: "Availability remains inside SLO, but the remaining margin is thinner than the dashboard headline suggests.",
+      footnote: "slo margin still intact",
       sparkline: timeline.map((point) => 99.6 + (100 - point.errorRate) * 0.004),
     },
     {
@@ -377,8 +377,8 @@ function buildMetrics(
         incidents.filter((incident) => incident.status !== "resolved").length > 0
           ? "negative"
           : "neutral",
-      context: "Open operational issues requiring active ownership.",
-      footnote: "Incident desk synced to local mock feed",
+      context: "Current response threads still overlap customer-facing request paths and need active ownership.",
+      footnote: "checkout + ingest still active",
       sparkline: timeline.map((point) => point.incidentLoad),
     },
   ];

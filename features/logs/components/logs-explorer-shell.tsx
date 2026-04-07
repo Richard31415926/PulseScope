@@ -118,23 +118,25 @@ export function LogsExplorerShell() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageHeader
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <SavedViewsMenu triggerVariant="secondary" />
             <Button
+              aria-label="Live mode"
               aria-pressed={urlState.liveMode}
               data-pulsescope-live-toggle="true"
               onClick={() => updateUrlState({ liveMode: !urlState.liveMode })}
               variant={urlState.liveMode ? "default" : "secondary"}
             >
               <Radio className="size-4" />
-              Live mode
+              Live
             </Button>
           </div>
         }
-        description="A dense, virtualized log stream designed for stable scanning at scale: fast text search, level and environment narrowing, trace pivots, and inline expansion without losing your place in the list."
+        density="tight"
+        description="A stable, high-density log stream for fast scanning: tight filters, trace pivots, live tail simulation, and keyboard-safe expansion without losing list context."
         eyebrow="Signal Stream"
         meta={
           <>
@@ -144,11 +146,11 @@ export function LogsExplorerShell() {
                 role="status"
                 aria-live="polite"
               >
-                Live stream active
+                live stream active
               </div>
             ) : (
               <div className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/56">
-                Live stream paused
+                live stream paused
               </div>
             )}
             <div className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/56">
@@ -180,9 +182,14 @@ export function LogsExplorerShell() {
         />
 
         <SurfacePanel
+          action={
+            <div className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-white/52">
+              {visibleLogs.length} visible / {combinedLogs.length} buffered
+            </div>
+          }
           className="p-4"
-          description="Rendering is intentionally capped to visible rows while the full filtered dataset stays searchable and keyboard navigable."
-          title="Log workspace"
+          description="Rendering stays capped to visible rows while the full filtered dataset remains searchable, keyboard navigable, and correlation-aware."
+          title="Log stream"
         >
           <VirtualizedLogList
             expandedLogId={resolvedExpandedLogId}

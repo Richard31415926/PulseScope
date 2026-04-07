@@ -9,7 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { environmentOptions, isActivePath, primaryNavigation, secondaryNavigation } from "@/lib/navigation";
+import {
+  environmentOptions,
+  isActivePath,
+  primaryNavigation,
+  savedViewOptions,
+  secondaryNavigation,
+  timeRangeOptions,
+} from "@/lib/navigation";
 import { buildWorkspaceHref } from "@/lib/workspace-state";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/store/ui-store";
@@ -30,13 +37,17 @@ function SidebarContent({
   const timeRange = useUiStore((state) => state.activeTimeRange);
   const currentEnvironment =
     environmentOptions.find((option) => option.value === environment)?.label ?? "Production";
+  const currentTimeRange =
+    timeRangeOptions.find((option) => option.value === timeRange)?.label ?? "Last hour";
+  const currentView =
+    savedViewOptions.find((option) => option.value === savedView)?.label ?? "Default View";
 
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between gap-3 p-4">
         <Link
           className={cn(
-            "overflow-hidden rounded-[24px] border border-white/10 bg-white/[0.04] p-3",
+            "overflow-hidden rounded-[24px] border border-white/10 bg-white/[0.045] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
             collapsed && "mx-auto",
           )}
           href={buildWorkspaceHref("/overview", {
@@ -61,9 +72,19 @@ function SidebarContent({
           <div className={cn("space-y-1", collapsed && "text-center")}>
             <div className="text-sm font-medium text-white">{collapsed ? "Live" : currentEnvironment}</div>
             {!collapsed ? (
-              <div className="text-xs leading-5 text-white/44">
-                Dense, trace-first shell with local mock APIs and keyboard navigation.
-              </div>
+              <>
+                <div className="text-xs leading-5 text-white/44">
+                  Investigation-first shell with URL-synced context and local mock telemetry.
+                </div>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <span className="rounded-full border border-white/10 bg-black/14 px-2.5 py-1 text-[10px] tracking-[0.14em] text-white/40 uppercase">
+                    {currentTimeRange}
+                  </span>
+                  <span className="rounded-full border border-white/10 bg-black/14 px-2.5 py-1 text-[10px] tracking-[0.14em] text-white/40 uppercase">
+                    {currentView}
+                  </span>
+                </div>
+              </>
             ) : null}
           </div>
         </div>
@@ -107,7 +128,7 @@ function SidebarContent({
             {!collapsed ? (
               <div className="min-w-0">
                 <div className="text-sm font-medium text-white">PulseScope Shell</div>
-                <div className="text-xs text-white/42">Foundation milestone</div>
+                <div className="text-xs text-white/42">Investigation-first workbench</div>
               </div>
             ) : null}
           </div>
@@ -154,9 +175,9 @@ function NavSection({
             <Link
               aria-current={active ? "page" : undefined}
               className={cn(
-                "group flex items-center gap-3 rounded-[22px] border px-3 py-3",
+                "group flex items-center gap-3 rounded-[20px] border px-3 py-2.5",
                 active
-                  ? "border-white/14 bg-white/[0.08] text-white"
+                  ? "border-[rgba(102,150,255,0.22)] bg-[linear-gradient(180deg,rgba(94,126,255,0.1),rgba(255,255,255,0.03))] text-white"
                   : "border-transparent text-white/56 hover:border-white/8 hover:bg-white/[0.05] hover:text-white/86",
                 collapsed && "justify-center px-0",
               )}
@@ -216,7 +237,7 @@ export function AppSidebar() {
       <aside className="hidden shrink-0 lg:block">
         <motion.div
           animate={{ width: sidebarCollapsed ? 106 : 312 }}
-          className="relative h-screen border-r border-white/8 bg-black/18 backdrop-blur-xl"
+          className="relative h-screen border-r border-white/8 bg-[rgba(9,12,17,0.62)] backdrop-blur-2xl"
           transition={{ duration: 0.24, ease: [0.2, 0.8, 0.2, 1] }}
         >
           <div className="absolute inset-y-0 right-0 w-px bg-white/6" />

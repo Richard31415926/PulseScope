@@ -18,7 +18,7 @@ export function FilterBar({
   return (
     <div
       className={cn(
-        "surface-panel rounded-[28px] border border-white/10 p-4 backdrop-blur-xl",
+        "surface-panel min-w-0 rounded-[28px] border border-white/10 p-3.5 backdrop-blur-xl",
         className,
       )}
     >
@@ -31,7 +31,7 @@ export function FilterBarSection({
   children,
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("flex flex-wrap items-center gap-2", className)}>{children}</div>;
+  return <div className={cn("flex min-w-0 flex-wrap items-center gap-1.5", className)}>{children}</div>;
 }
 
 export function FilterBarLabel({
@@ -51,9 +51,9 @@ export function FilterSearchField({
   ...props
 }: React.ComponentProps<typeof Input>) {
   return (
-    <div className={cn("relative min-w-[280px] flex-1", className)}>
+    <div className={cn("relative min-w-[260px] flex-1", className)}>
       <Search className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-white/26" />
-      <Input className="pl-11" data-pulsescope-primary-search="true" {...props} />
+      <Input className="h-10 rounded-[16px] pl-11" data-pulsescope-primary-search="true" {...props} />
     </div>
   );
 }
@@ -66,9 +66,9 @@ export function FilterChipButton({
   return (
     <button
       className={cn(
-        "rounded-full border px-3.5 py-2 text-sm font-medium transition focus-visible:ring-2 focus-visible:ring-[rgba(122,145,255,0.72)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(7,10,20)]",
+        "rounded-full border px-3 py-1.5 text-[13px] font-medium transition focus-visible:ring-2 focus-visible:ring-[rgba(89,175,255,0.72)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgb(7,10,20)]",
         active
-          ? "border-white/18 bg-white/[0.12] text-white"
+          ? "border-[rgba(102,150,255,0.2)] bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(94,126,255,0.08))] text-white"
           : "border-white/10 bg-white/[0.04] text-white/58 hover:border-white/16 hover:bg-white/[0.08] hover:text-white/78",
         className,
       )}
@@ -94,7 +94,7 @@ export function FilterSelect<TValue extends string>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="min-w-[156px] justify-between rounded-full" variant="secondary">
+        <Button className="h-9 min-w-[132px] justify-between rounded-[16px] px-3.5 text-[13px]" size="sm" variant="secondary">
           <span>{selected?.label ?? placeholder}</span>
           <ChevronDown className="size-4 text-white/34" />
         </Button>

@@ -6,10 +6,10 @@ import { useVirtualList } from "@/hooks/use-virtual-list";
 import { LogListRow } from "@/features/logs/components/log-list-row";
 import type { LogRecord } from "@/types/pulsescope";
 
-const collapsedRowHeight = 88;
-const expandedRowHeight = 252;
+const collapsedRowHeight = 78;
+const expandedRowHeight = 232;
 
-const headerColumns = "126px 86px 176px minmax(0,1fr) 180px 28px";
+const headerColumns = "146px 96px 176px minmax(0,1fr) 188px 28px";
 
 export function VirtualizedLogList({
   expandedLogId,
@@ -57,9 +57,13 @@ export function VirtualizedLogList({
   }
 
   return (
-    <div aria-label="Virtualized log table" className="overflow-hidden rounded-[28px] border border-white/10 bg-black/16" role="table">
+    <div
+      aria-label="Virtualized log table"
+      className="overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01))]"
+      role="table"
+    >
       <div
-        className="grid items-center gap-4 border-b border-white/8 bg-white/[0.04] px-7 py-3 text-[11px] font-semibold tracking-[0.18em] text-white/34 uppercase"
+        className="grid items-center gap-4 border-b border-white/8 bg-[rgba(25,30,40,0.9)] px-6 py-3 text-[11px] font-semibold tracking-[0.18em] text-white/34 uppercase backdrop-blur-xl"
         role="rowgroup"
         style={{ gridTemplateColumns: headerColumns }}
       >
@@ -71,7 +75,7 @@ export function VirtualizedLogList({
         <div role="columnheader" />
       </div>
 
-      <div className="h-[760px] overflow-auto" ref={parentRef} role="rowgroup">
+      <div className="h-[780px] overflow-auto px-1 py-1.5" ref={parentRef} role="rowgroup">
         <div className="relative" style={{ height: `${totalSize}px` }}>
           {virtualItems.map((virtualItem) => {
             const log = logs[virtualItem.index];

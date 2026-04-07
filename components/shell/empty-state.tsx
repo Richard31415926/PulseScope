@@ -20,25 +20,27 @@ export function EmptyState({
   secondaryActionLabel,
 }: EmptyStateProps) {
   return (
-    <SurfacePanel className="flex min-h-56 items-center justify-center">
-      <div className="max-w-md space-y-4 text-center">
-        <div className="mx-auto flex size-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/72">
-          <SearchX className="size-5" />
+    <SurfacePanel className="flex min-h-48 items-center justify-center rounded-[26px]">
+      <div className="max-w-[34rem] space-y-3 text-center">
+        <div className="mx-auto flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white/68">
+          <SearchX className="size-4.5" />
         </div>
-        <div className="text-[11px] font-semibold tracking-[0.18em] text-white/34 uppercase" role="status">
-          Empty state
+        <div className="text-[11px] font-semibold tracking-[0.18em] text-white/32 uppercase" role="status">
+          No results in this slice
         </div>
-        <div className="font-display text-2xl font-semibold text-white">{title}</div>
-        <p className="text-sm leading-6 text-white/52">{description}</p>
+        <div className="font-display text-[1.55rem] font-semibold tracking-[-0.04em] text-white">
+          {title}
+        </div>
+        <p className="text-sm leading-6 text-white/50">{description}</p>
         {actionLabel || secondaryActionLabel ? (
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
             {actionLabel ? (
-              <Button onClick={onAction} variant="secondary">
+              <Button onClick={onAction} size="sm" variant="secondary">
                 {actionLabel}
               </Button>
             ) : null}
             {secondaryActionLabel ? (
-              <Button onClick={onSecondaryAction} variant="ghost">
+              <Button onClick={onSecondaryAction} size="sm" variant="ghost">
                 {secondaryActionLabel}
               </Button>
             ) : null}

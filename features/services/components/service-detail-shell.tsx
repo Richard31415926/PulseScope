@@ -12,14 +12,17 @@ import { StatusPill } from "@/components/shell/status-pill";
 import { Button } from "@/components/ui/button";
 import { ServiceDependencyGraph } from "@/features/services/components/service-dependency-graph";
 import { ServiceMetricTrendCard } from "@/features/services/components/service-metric-trend-card";
+import { useWorkspaceControls } from "@/hooks/use-workspace-controls";
 import { useWorkspaceHref } from "@/hooks/use-workspace-href";
 import { queryKeys } from "@/lib/query-keys";
 import { getServiceDetail } from "@/lib/mock-api/services";
+import { buildWorkspaceHref } from "@/lib/workspace-state";
 import { formatCompactNumber, formatDuration, formatPercentage } from "@/lib/utils";
 
 export function ServiceDetailShell({ serviceId }: { serviceId: string }) {
   const servicesHref = useWorkspaceHref("/services");
   const incidentsHref = useWorkspaceHref("/incidents");
+  const { workspaceState } = useWorkspaceControls();
   const serviceQuery = useQuery({
     queryKey: queryKeys.serviceDetail(serviceId),
     queryFn: () => getServiceDetail(serviceId),
@@ -56,9 +59,16 @@ export function ServiceDetailShell({ serviceId }: { serviceId: string }) {
   }
 
   const service = serviceQuery.data;
+  const tracesHref = buildWorkspaceHref("/traces", workspaceState, { service: service.id });
+  const logsHref = buildWorkspaceHref("/logs", workspaceState, { logService: service.id });
+  const incidentFocusHref = buildWorkspaceHref(
+    "/incidents",
+    workspaceState,
+    service.recentIncidents[0] ? { incident: service.recentIncidents[0].id } : undefined,
+  );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageHeader
         actions={
           <>
@@ -77,6 +87,7 @@ export function ServiceDetailShell({ serviceId }: { serviceId: string }) {
           </>
         }
         description={service.description}
+        density="tight"
         eyebrow="Service Focus"
         meta={
           <>
@@ -96,14 +107,55 @@ export function ServiceDetailShell({ serviceId }: { serviceId: string }) {
       <SurfacePanel
         action={<HealthIndicator status={service.status} />}
         className="surface-elevated"
-        description="Operational summary tuned for quick comprehension before diving into trend detail or dependency context."
+        description="Operational summary tuned for quick comprehension before diving into trend detail, incident history, or dependency context."
         title="Service synopsis"
       >
-        <div className="grid gap-4 md:grid-cols-4">
-          <SynopsisMetric label="Latency" value={service.latency} />
-          <SynopsisMetric label="Throughput" value={service.throughput} />
-          <SynopsisMetric label="Error rate" value={service.errorRate} />
-          <SynopsisMetric label="Availability" value={service.availability} />
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.08fr)_minmax(340px,0.92fr)]">
+          <div className="min-w-0 rounded-[26px] border border-white/8 bg-white/[0.03] p-5">
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <StatusPill label={service.tier} />
+              <div className="rounded-full border border-white/10 bg-black/14 px-3 py-1.5 text-xs text-white/56">
+                {service.owner}
+              </div>
+              <div className="rounded-full border border-white/10 bg-black/14 px-3 py-1.5 text-xs text-white/56">
+                {service.environment}
+              </div>
+            </div>
+            <div className="max-w-2xl text-sm leading-7 text-white/56">
+              {service.description}
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <SynopsisDetail label="Dependencies" value={`${service.dependencies.length}`} />
+              <SynopsisDetail label="Dependents" value={`${service.dependents.length}`} />
+              <SynopsisDetail label="Recent incidents" value={`${service.recentIncidents.length}`} />
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button asChild size="sm" variant="ghost">
+                <Link href={tracesHref}>
+                  Service traces
+                  <ArrowUpRight className="size-4" />
+                </Link>
+              </Button>
+              <Button asChild size="sm" variant="ghost">
+                <Link href={logsHref}>
+                  Service logs
+                  <ArrowUpRight className="size-4" />
+                </Link>
+              </Button>
+              <Button asChild size="sm" variant="ghost">
+                <Link href={incidentFocusHref}>
+                  Incident context
+                  <ArrowUpRight className="size-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <SynopsisMetric label="Latency" value={service.latency} />
+            <SynopsisMetric label="Throughput" value={service.throughput} />
+            <SynopsisMetric label="Error rate" value={service.errorRate} />
+            <SynopsisMetric label="Availability" value={service.availability} />
+          </div>
         </div>
       </SurfacePanel>
 
@@ -128,7 +180,7 @@ export function ServiceDetailShell({ serviceId }: { serviceId: string }) {
         />
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[1.12fr_0.88fr]">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.08fr)_minmax(320px,0.92fr)]">
         <div className="space-y-4">
           <SurfacePanel
             description="Operations are ranked to keep the highest-latency or most failure-prone paths visible first."
@@ -137,7 +189,7 @@ export function ServiceDetailShell({ serviceId }: { serviceId: string }) {
             <div className="space-y-3">
               {service.topOperations.map((operation) => (
                 <div
-                  className="grid gap-4 rounded-[22px] border border-white/8 bg-white/[0.03] px-4 py-4 lg:grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr]"
+                  className="grid gap-4 rounded-[24px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.015))] px-4 py-4 lg:grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr]"
                   key={operation.name}
                 >
                   <div>
@@ -162,7 +214,7 @@ export function ServiceDetailShell({ serviceId }: { serviceId: string }) {
               <div className="space-y-3">
                 {service.recentIncidents.map((incident) => (
                   <div
-                    className="rounded-[22px] border border-white/8 bg-white/[0.03] p-4"
+                    className="rounded-[22px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.015))] p-4"
                     key={incident.id}
                   >
                     <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -174,6 +226,12 @@ export function ServiceDetailShell({ serviceId }: { serviceId: string }) {
                     <div className="mt-3 text-xs text-white/32">
                       Commander {incident.commander} · Updated {incident.updatedAt}
                     </div>
+                    <Button asChild className="mt-4 justify-between" size="sm" variant="ghost">
+                      <Link href={buildWorkspaceHref("/incidents", workspaceState, { incident: incident.id })}>
+                        Open incident
+                        <ArrowUpRight className="size-4" />
+                      </Link>
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -219,7 +277,16 @@ function SynopsisMetric({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-[22px] border border-white/8 bg-white/[0.03] p-4">
       <div className="mb-2 text-sm text-white/40">{label}</div>
-      <div className="font-display text-2xl font-semibold tracking-[-0.03em] text-white">{value}</div>
+      <div className="font-display text-2xl font-semibold tracking-[-0.04em] text-white">{value}</div>
+    </div>
+  );
+}
+
+function SynopsisDetail({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-[18px] border border-white/8 bg-black/14 px-4 py-3">
+      <div className="text-[10px] font-semibold tracking-[0.18em] text-white/30 uppercase">{label}</div>
+      <div className="mt-1 text-sm font-medium text-white">{value}</div>
     </div>
   );
 }

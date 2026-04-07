@@ -62,13 +62,13 @@ export function OverviewControls({
   return (
     <motion.div
       animate={{ opacity: 1, y: 0 }}
-      className="surface-panel flex flex-wrap items-center justify-end gap-3 rounded-[28px] border border-white/10 p-3"
+      className="surface-panel flex min-w-0 flex-wrap items-center gap-2.5 rounded-[26px] border border-white/10 p-3"
       initial={{ opacity: 0, y: 10 }}
       transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
     >
-      <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white/46 md:flex">
-        <Layers3 className="size-4" />
-        Overview scope
+      <div className="flex min-w-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white/48">
+        <Layers3 className="size-4 shrink-0" />
+        <span className="truncate">Overview scope</span>
       </div>
       <Selector
         items={environmentOptions}
@@ -83,11 +83,11 @@ export function OverviewControls({
         value={workspaceState.timeRange}
       />
       <SavedViewsMenu triggerVariant="secondary" />
-      <CompareRangeMenu />
+      <CompareRangeMenu compact />
       {generatedAt ? (
-        <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white/46">
-          <Clock3 className="size-4" />
-          {generatedAt}
+        <div className="flex min-w-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white/46">
+          <Clock3 className="size-4 shrink-0" />
+          <span className="truncate">{generatedAt}</span>
         </div>
       ) : null}
     </motion.div>

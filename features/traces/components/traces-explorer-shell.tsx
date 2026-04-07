@@ -103,7 +103,7 @@ export function TracesExplorerShell() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageHeader
         actions={
           <>
@@ -111,7 +111,8 @@ export function TracesExplorerShell() {
             <Button variant="default">Create latency alert</Button>
           </>
         }
-        description="Flagship trace exploration built for dense operational scanning: URL-synced filters, premium hover preview, sortable rows, and a right-side investigative drawer that keeps context without forcing an immediate drill-down."
+        density="tight"
+        description="Flagship trace exploration for fast scanning: URL-synced filters, dense rows, and a right-side rail that preserves investigation flow."
         eyebrow="Latency Lab"
         meta={
           <>
@@ -143,15 +144,18 @@ export function TracesExplorerShell() {
         />
 
         <SurfacePanel
-          className="overflow-hidden p-0"
-          description="The table stays dense without collapsing into noise by letting the right rail absorb rich detail, leaving the row grid free to optimize for scanning speed."
+          className="overflow-hidden"
           title="Trace workspace"
         >
           {tracesQuery.data.traces.length > 0 ? (
-            <ResizablePanelGroup autoSaveId="traces-explorer-layout" className="min-h-[760px]" direction="horizontal">
-              <ResizablePanel defaultSize={67} minSize={52}>
-                <div className="h-full p-3">
-                  <div className="h-full overflow-x-auto rounded-[28px] border border-white/8 bg-white/[0.02] p-2">
+            <ResizablePanelGroup
+              autoSaveId="traces-explorer-layout-v3"
+              className="min-h-[640px]"
+              direction="horizontal"
+            >
+              <ResizablePanel defaultSize={72} minSize={58}>
+                <div className="h-full min-w-0 p-4">
+                  <div className="h-full min-w-0 overflow-auto rounded-[28px] border border-white/8 bg-white/[0.02] p-2">
                     <TracesTable
                       activeTraceId={activeTrace?.id ?? null}
                       onHoverTrace={(traceId) => {
@@ -169,8 +173,8 @@ export function TracesExplorerShell() {
 
               <ResizableHandle withHandle />
 
-              <ResizablePanel defaultSize={33} minSize={28}>
-                <div className="h-full border-l border-white/8 p-5">
+              <ResizablePanel defaultSize={30} minSize={30}>
+                <div className="h-full overflow-y-auto border-l border-white/8 p-5">
                   <TracesPreviewDrawer trace={activeTrace} />
                 </div>
               </ResizablePanel>

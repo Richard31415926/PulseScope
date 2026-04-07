@@ -29,7 +29,11 @@ function TopbarDropdown<TValue extends string>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="min-w-36 justify-between rounded-full" variant="secondary">
+        <Button
+          className="h-9 min-w-[132px] justify-between rounded-[16px] px-3.5 text-[13px]"
+          size="sm"
+          variant="secondary"
+        >
           <span className="flex items-center gap-2">
             {triggerIcon}
             <span>{label}</span>
@@ -64,8 +68,8 @@ export function AppTopbar() {
     timeRangeOptions.find((option) => option.value === workspaceState.timeRange)?.label ?? "Last hour";
 
   return (
-    <header className="sticky top-0 z-30 border-b border-white/8 bg-black/18 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-[1700px] items-center justify-between gap-4 px-4 py-4 lg:px-8">
+    <header className="sticky top-0 z-30 border-b border-white/8 bg-[rgba(9,12,17,0.74)] backdrop-blur-2xl">
+      <div className="mx-auto flex max-w-[1700px] items-center justify-between gap-4 px-4 py-3 lg:px-8">
         <div className="flex min-w-0 items-center gap-3">
           <Button
             aria-label="Open navigation"
@@ -76,15 +80,16 @@ export function AppTopbar() {
           >
             <Menu className="size-4" />
           </Button>
-          <div className="min-w-0">
-            <div className="text-[11px] font-semibold tracking-[0.18em] text-white/34 uppercase">
+          <div className="min-w-0 max-w-[360px]">
+            <div className="text-[11px] font-semibold tracking-[0.2em] text-white/32 uppercase">
               {routeMeta.eyebrow}
             </div>
-            <div className="truncate text-sm text-white/74">{routeMeta.description}</div>
+            <div className="truncate text-sm font-medium text-white/82">{routeMeta.title}</div>
+            <div className="hidden text-xs leading-5 text-white/52 2xl:block">{routeMeta.description}</div>
           </div>
         </div>
 
-        <div className="hidden items-center gap-3 xl:flex">
+        <div className="hidden items-center gap-2 xl:flex">
           <TopbarDropdown
             items={environmentOptions}
             label={environmentLabel}
@@ -97,15 +102,20 @@ export function AppTopbar() {
             onSelect={(value) => replaceWorkspaceState({ timeRange: value })}
             triggerIcon={<TimerReset className="size-4 text-white/40" />}
           />
-          <SavedViewsMenu bridgeShortcut label={savedViewOptions.find((option) => option.value === workspaceState.savedView)?.label ?? "Default View"} />
-          <CompareRangeMenu bridgeShortcut compact />
+          <SavedViewsMenu
+            bridgeShortcut
+            className="h-9 min-w-[142px] rounded-[16px] px-3.5 text-[13px]"
+            label={savedViewOptions.find((option) => option.value === workspaceState.savedView)?.label ?? "Default View"}
+          />
+          <CompareRangeMenu bridgeShortcut className="h-9 rounded-[16px] px-3.5 text-[13px]" compact />
         </div>
 
         <div className="flex items-center gap-2">
           <Button
             aria-label="Open command palette"
-            className="min-w-[152px] justify-between max-sm:size-10 max-sm:min-w-0"
+            className="h-9 min-w-[148px] justify-between rounded-[16px] px-3.5 max-sm:size-10 max-sm:min-w-0"
             onClick={() => setCommandPaletteOpen(true)}
+            size="sm"
             variant="secondary"
           >
             <span className="flex items-center gap-2 max-sm:hidden">

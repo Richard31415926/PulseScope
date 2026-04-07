@@ -25,11 +25,11 @@ export function ServiceMetricTrendCard({
   const delta = baseline === 0 ? 0 : ((current - baseline) / baseline) * 100;
 
   return (
-    <div className="surface-panel rounded-[24px] border border-white/10 p-4">
+    <div className="surface-panel min-w-0 rounded-[26px] border border-white/10 p-4">
       <div className="mb-5 flex items-start justify-between gap-4">
-        <div>
+        <div className="min-w-0">
           <div className="mb-2 text-sm text-white/40">{label}</div>
-          <div className="font-display text-3xl font-semibold tracking-[-0.04em] text-white">
+          <div className="font-display text-3xl font-semibold tracking-[-0.05em] text-white">
             {formatMetric(current, type)}
           </div>
         </div>
@@ -46,7 +46,8 @@ export function ServiceMetricTrendCard({
         </div>
       </div>
 
-      <div className="flex h-20 items-end gap-1.5">
+      <div className="rounded-[22px] border border-white/8 bg-black/12 px-3 py-3">
+        <div className="flex h-20 items-end gap-1.5">
         {values.map((value, index) => (
           <div className="flex min-w-0 flex-1 flex-col items-center gap-2" key={`${label}-${index}`}>
             <div
@@ -56,6 +57,7 @@ export function ServiceMetricTrendCard({
             <div className="text-[10px] text-white/28">{points[index]?.timestamp}</div>
           </div>
         ))}
+        </div>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 import { SurfacePanel } from "@/components/shell/panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useWorkspaceHref } from "@/hooks/use-workspace-href";
 import { getStatusTone } from "@/lib/utils";
 import type { LogRecord } from "@/types/pulsescope";
 
@@ -17,13 +18,15 @@ export function TraceRelatedLogsPanel({
   isLoading: boolean;
   logs: LogRecord[];
 }) {
+  const logsHref = useWorkspaceHref("/logs");
+
   return (
     <SurfacePanel
       description="Correlated log lines stay in the same investigation rail so trace-level timing and textual evidence can be read together."
       title="Related logs"
       action={
         <Button asChild size="sm" variant="ghost">
-          <Link href="/logs">
+          <Link href={logsHref}>
             Open explorer
             <ArrowUpRight className="size-4" />
           </Link>
@@ -63,7 +66,7 @@ export function TraceRelatedLogsPanel({
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <Badge variant={getLogVariant(log.level)}>{log.level}</Badge>
                 <div className="text-xs text-white/36">{log.timestamp}</div>
-                <div className="text-xs text-white/26">{log.service}</div>
+                <div className="text-xs text-white/26 [overflow-wrap:anywhere]">{log.service}</div>
               </div>
               <div className="text-sm leading-6 text-white/82">{log.message}</div>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -74,7 +77,9 @@ export function TraceRelatedLogsPanel({
                   >
                     <span className="text-white/32">{field.key}</span>
                     <span className="mx-2 text-white/20">:</span>
-                    <span className="font-mono text-[11px] text-white/74">{field.value}</span>
+                    <span className="font-mono text-[11px] text-white/74 [overflow-wrap:anywhere]">
+                      {field.value}
+                    </span>
                   </div>
                 ))}
               </div>

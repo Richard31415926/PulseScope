@@ -47,10 +47,13 @@ export function TraceSpanInspector({
                 <Badge variant="neutral">{span.kind}</Badge>
                 {isPrimarySpan ? <Badge variant="warning">primary pressure point</Badge> : null}
               </div>
-              <div className="font-display text-2xl font-semibold tracking-[-0.04em] text-white" data-testid="span-inspector-title">
+              <div
+                className="font-display text-2xl font-semibold tracking-[-0.04em] text-white [overflow-wrap:anywhere]"
+                data-testid="span-inspector-title"
+              >
                 {span.name}
               </div>
-              <div className="mt-2 text-sm text-white/48">{span.service}</div>
+              <div className="mt-2 text-sm text-white/48 [overflow-wrap:anywhere]">{span.service}</div>
               <p className="mt-4 text-sm leading-7 text-white/60">{span.summary}</p>
             </div>
 
@@ -80,7 +83,9 @@ export function TraceSpanInspector({
                   >
                     <span className="text-white/34">{attribute.key}</span>
                     <span className="mx-2 text-white/20">/</span>
-                    <span className="font-mono text-[11px] text-white/76">{attribute.value}</span>
+                    <span className="font-mono text-[11px] text-white/76 [overflow-wrap:anywhere]">
+                      {attribute.value}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -120,9 +125,11 @@ function MetricBlock({ label, value }: { label: string; value: string }) {
 
 function DetailLine({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-[18px] border border-white/8 bg-white/[0.03] px-4 py-3">
-      <div className="text-sm text-white/40">{label}</div>
-      <div className="max-w-[58%] truncate text-sm font-medium text-white">{value}</div>
+    <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-4 rounded-[18px] border border-white/8 bg-white/[0.03] px-4 py-3">
+      <div className="shrink-0 text-sm text-white/40">{label}</div>
+      <div className="justify-self-end text-right text-sm font-medium leading-6 text-white [overflow-wrap:anywhere]">
+        {value}
+      </div>
     </div>
   );
 }

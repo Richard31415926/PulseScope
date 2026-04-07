@@ -71,7 +71,8 @@ export function TraceDetailShell({ traceId }: { traceId: string }) {
             <Button variant="default">Pin investigation</Button>
           </>
         }
-        description="A dense investigation surface designed around the waterfall, with the inspector and correlated logs staying visible while you move across spans."
+        density="tight"
+        description="A dense investigation surface built around the waterfall, with inspector and correlated logs visible while you move across spans."
         eyebrow="Trace Investigation"
         meta={
           <>
@@ -92,7 +93,7 @@ export function TraceDetailShell({ traceId }: { traceId: string }) {
 
       <TraceSummaryHeader trace={trace} />
 
-      <ResizablePanelGroup autoSaveId="trace-detail-layout" className="min-h-[840px]" direction="horizontal">
+      <ResizablePanelGroup autoSaveId="trace-detail-layout-v2" className="min-h-[840px]" direction="horizontal">
         <ResizablePanel defaultSize={68} minSize={54}>
           <div className="h-full pr-2">
             <TraceWaterfallTimeline
@@ -112,7 +113,7 @@ export function TraceDetailShell({ traceId }: { traceId: string }) {
 
         <ResizableHandle withHandle />
 
-        <ResizablePanel defaultSize={32} minSize={28}>
+        <ResizablePanel defaultSize={32} minSize={30}>
           <div className="space-y-4 pl-2">
             <TraceSpanInspector span={selectedSpan} trace={trace} />
             <TraceRelatedLogsPanel

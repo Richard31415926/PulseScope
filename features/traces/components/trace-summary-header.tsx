@@ -6,10 +6,15 @@ import { ArrowUpRight, Logs, Route, Server } from "lucide-react";
 import { SurfacePanel } from "@/components/shell/panel";
 import { StatusPill } from "@/components/shell/status-pill";
 import { Button } from "@/components/ui/button";
+import { useWorkspaceHref } from "@/hooks/use-workspace-href";
 import { formatDuration } from "@/lib/utils";
 import type { TraceDetail } from "@/types/pulsescope";
 
 export function TraceSummaryHeader({ trace }: { trace: TraceDetail }) {
+  const primaryServiceHref = useWorkspaceHref(`/services/${trace.service}`);
+  const relatedServiceHref = useWorkspaceHref(`/services/${trace.relatedService}`);
+  const logsHref = useWorkspaceHref("/logs", { q: trace.id });
+
   return (
     <motion.div
       animate={{ opacity: 1, y: 0 }}
@@ -17,7 +22,7 @@ export function TraceSummaryHeader({ trace }: { trace: TraceDetail }) {
       transition={{ duration: 0.24, ease: [0.2, 0.8, 0.2, 1] }}
     >
       <SurfacePanel className="surface-elevated overflow-hidden border-white/12 p-0">
-        <div className="border-b border-white/8 px-6 py-5">
+        <div className="border-b border-white/8 px-5 py-4">
           <div className="mb-4 flex flex-wrap items-center gap-2">
             <StatusPill label={trace.status} />
             <MetaBadge label={trace.method} />
@@ -32,29 +37,29 @@ export function TraceSummaryHeader({ trace }: { trace: TraceDetail }) {
                 <div className="mb-2 text-[11px] font-semibold tracking-[0.18em] text-white/34 uppercase">
                   Trace summary
                 </div>
-                <h1 className="font-display text-3xl font-semibold tracking-[-0.05em] text-white lg:text-[2.5rem]">
+                <h1 className="font-display text-3xl font-semibold tracking-[-0.05em] text-white lg:text-[2.2rem] [overflow-wrap:anywhere]">
                   {trace.endpoint}
                 </h1>
-                <div className="mt-2 text-base text-white/56">{trace.operation}</div>
+                <div className="mt-2 text-base text-white/56 [overflow-wrap:anywhere]">{trace.operation}</div>
               </div>
 
               <p className="max-w-3xl text-sm leading-7 text-white/60">{trace.rootCause}</p>
 
               <div className="flex flex-wrap items-center gap-3">
                 <Button asChild variant="secondary">
-                  <Link href={`/services/${trace.service}`}>
+                  <Link href={primaryServiceHref}>
                     Primary service
                     <ArrowUpRight className="size-4" />
                   </Link>
                 </Button>
                 <Button asChild variant="secondary">
-                  <Link href={`/services/${trace.relatedService}`}>
+                  <Link href={relatedServiceHref}>
                     Related service
                     <ArrowUpRight className="size-4" />
                   </Link>
                 </Button>
                 <Button asChild variant="ghost">
-                  <Link href="/logs">
+                  <Link href={logsHref}>
                     Open logs
                     <Logs className="size-4" />
                   </Link>
@@ -74,7 +79,7 @@ export function TraceSummaryHeader({ trace }: { trace: TraceDetail }) {
           </div>
         </div>
 
-        <div className="grid gap-6 px-6 py-5 xl:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="grid gap-6 px-5 py-4 xl:grid-cols-[minmax(0,1fr)_300px]">
           <div className="space-y-4">
             <div className="text-[11px] font-semibold tracking-[0.18em] text-white/34 uppercase">
               Request path
@@ -84,7 +89,7 @@ export function TraceSummaryHeader({ trace }: { trace: TraceDetail }) {
                 <div className="flex items-center gap-2" key={`${trace.id}-${service}`}>
                   <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-3 py-2 text-sm text-white/72">
                     <Server className="size-3.5 text-white/36" />
-                    <span>{service}</span>
+                    <span className="[overflow-wrap:anywhere]">{service}</span>
                   </div>
                   {index < trace.servicePath.length - 1 ? (
                     <Route className="size-4 text-white/22" />
@@ -119,7 +124,7 @@ function MetaBadge({
         mono ? "font-mono text-[12px]" : ""
       }`}
     >
-      {label}
+      <span className={mono ? "break-all" : "break-words"}>{label}</span>
     </div>
   );
 }

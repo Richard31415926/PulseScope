@@ -50,11 +50,12 @@ export function CompareRangeMenu({
         <Button
           aria-pressed={workspaceState.compareMode}
           className={cn(
-            "justify-between rounded-full",
-            compact ? "min-w-[140px]" : "min-w-[196px]",
+            "justify-between rounded-[16px]",
+            compact ? "min-w-[128px]" : "min-w-[172px]",
             className,
           )}
           data-pulsescope-compare-trigger={bridgeShortcut ? "global" : "local"}
+          size="sm"
           variant={workspaceState.compareMode ? "default" : "secondary"}
         >
           <span className="flex items-center gap-2 truncate">

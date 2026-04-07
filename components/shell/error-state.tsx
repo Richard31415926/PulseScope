@@ -16,25 +16,27 @@ export function ErrorState({
   onSecondaryAction?: () => void;
 }) {
   return (
-    <SurfacePanel className="flex min-h-56 items-center justify-center">
-      <div className="max-w-md space-y-4 text-center" role="alert">
-        <div className="mx-auto flex size-12 items-center justify-center rounded-full border border-danger/30 bg-danger/10 text-danger">
-          <AlertTriangle className="size-5" />
+    <SurfacePanel className="flex min-h-48 items-center justify-center rounded-[26px]">
+      <div className="max-w-[34rem] space-y-3 text-center" role="alert">
+        <div className="mx-auto flex size-10 items-center justify-center rounded-full border border-danger/28 bg-danger/10 text-danger">
+          <AlertTriangle className="size-4.5" />
         </div>
-        <div className="text-[11px] font-semibold tracking-[0.18em] text-white/34 uppercase">
-          Error state
+        <div className="text-[11px] font-semibold tracking-[0.18em] text-white/32 uppercase">
+          Query failed
         </div>
-        <div className="font-display text-2xl font-semibold text-white">{title}</div>
-        <p className="text-sm leading-6 text-white/52">{description}</p>
+        <div className="font-display text-[1.55rem] font-semibold tracking-[-0.04em] text-white">
+          {title}
+        </div>
+        <p className="text-sm leading-6 text-white/50">{description}</p>
         {onRetry || secondaryActionLabel ? (
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
             {onRetry ? (
-              <Button onClick={onRetry} variant="secondary">
+              <Button onClick={onRetry} size="sm" variant="secondary">
                 Retry
               </Button>
             ) : null}
             {secondaryActionLabel ? (
-              <Button onClick={onSecondaryAction} variant="ghost">
+              <Button onClick={onSecondaryAction} size="sm" variant="ghost">
                 {secondaryActionLabel}
               </Button>
             ) : null}

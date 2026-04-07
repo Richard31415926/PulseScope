@@ -49,8 +49,9 @@ export function SavedViewsMenu({
     <DropdownMenu onOpenChange={setOpen} open={open}>
       <DropdownMenuTrigger asChild>
         <Button
-          className={cn("min-w-[172px] justify-between rounded-full", className)}
+          className={cn("min-w-[154px] justify-between rounded-[16px]", className)}
           data-pulsescope-saved-views-trigger={bridgeShortcut ? "global" : "local"}
+          size="sm"
           variant={triggerVariant}
         >
           <span className="flex items-center gap-2 truncate">

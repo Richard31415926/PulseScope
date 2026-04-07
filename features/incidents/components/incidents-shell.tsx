@@ -4,7 +4,7 @@ import type { Route } from "next";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ArrowUpRight, Clock3, Layers3, Siren, Waves } from "lucide-react";
+import { ArrowUpRight, Clock3, Layers3, Siren, Waves, Workflow } from "lucide-react";
 import { ErrorState } from "@/components/shell/error-state";
 import { EmptyState } from "@/components/shell/empty-state";
 import { SurfacePanel } from "@/components/shell/panel";
@@ -50,6 +50,28 @@ export function IncidentsShell() {
     incidents.find((incident) => incident.id === selectedIncidentId) ?? incidents[0];
   const activeCount = incidents.filter((incident) => incident.status !== "resolved").length;
   const criticalCount = incidents.filter((incident) => incident.severity === "critical").length;
+  const trackedServices = new Set(incidents.flatMap((incident) => incident.impactedServices)).size;
+  const latestTimelineEvent = selectedIncident.timeline.at(-1);
+  const serviceFocusHref = buildWorkspaceHref(
+    selectedIncident.impactedServices[0]
+      ? `/services/${selectedIncident.impactedServices[0]}`
+      : "/services",
+    workspaceState,
+  );
+  const traceFocusHref = buildWorkspaceHref(
+    "/traces",
+    workspaceState,
+    selectedIncident.impactedServices[0] ? { service: selectedIncident.impactedServices[0] } : undefined,
+  );
+  const logsFocusHref = buildWorkspaceHref(
+    "/logs",
+    workspaceState,
+    selectedIncident.relatedTraceIds[0]
+      ? { q: selectedIncident.relatedTraceIds[0] }
+      : selectedIncident.impactedServices[0]
+        ? { logService: selectedIncident.impactedServices[0] }
+        : undefined,
+  );
 
   if (incidents.length === 0) {
     return (
@@ -61,10 +83,11 @@ export function IncidentsShell() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageHeader
         actions={<Button variant="default">Open response room</Button>}
-        description="A response desk tuned for triage: severity-led list scanning on the left and a drawer-style incident narrative on the right."
+        density="tight"
+        description="A triage-first response desk: severity-led queue, current brief, and direct pivots into affected traces, services, and logs."
         eyebrow="Response Desk"
         meta={
           <>
@@ -72,25 +95,27 @@ export function IncidentsShell() {
               {activeCount} active incidents
             </div>
             <StatusPill label={selectedIncident.severity} />
+            <StatusPill label={selectedIncident.status} />
           </>
         }
         title="Coordinated incident review"
       />
 
-      <div className="grid gap-4 xl:grid-cols-3">
-        <SummaryCard icon={<Siren className="size-4" />} label="Active" value={`${activeCount}`} />
-        <SummaryCard icon={<Waves className="size-4" />} label="Critical" value={`${criticalCount}`} />
-        <SummaryCard icon={<Layers3 className="size-4" />} label="Tracked services" value={`${new Set(incidents.flatMap((incident) => incident.impactedServices)).size}`} />
+      <div className="grid gap-4 xl:grid-cols-4">
+        <SummaryCard icon={<Siren className="size-4" />} label="Active" supporting="Incidents not yet resolved" value={`${activeCount}`} />
+        <SummaryCard icon={<Waves className="size-4" />} label="Critical" supporting="Highest-severity incidents" value={`${criticalCount}`} />
+        <SummaryCard icon={<Layers3 className="size-4" />} label="Tracked services" supporting="Blast radius in current workspace" value={`${trackedServices}`} />
+        <SummaryCard icon={<Workflow className="size-4" />} label="Selected status" supporting="Current incident posture" value={selectedIncident.status} />
       </div>
 
       <SurfacePanel
-        className="overflow-hidden p-0"
-        description="The queue stays dense while the drawer keeps the response narrative anchored in one place."
+        className="overflow-hidden"
+        description="The queue stays dense while the incident brief preserves the full response narrative in one anchored workspace."
         title="Incident workspace"
       >
-        <ResizablePanelGroup autoSaveId="incidents-workspace-layout" className="min-h-[760px]" direction="horizontal">
+        <ResizablePanelGroup autoSaveId="incidents-workspace-layout-v2" className="min-h-[720px]" direction="horizontal">
           <ResizablePanel defaultSize={40} minSize={32}>
-            <div className="space-y-3 p-5">
+            <div className="space-y-2 p-1">
               {incidents.map((incident) => {
                 const active = incident.id === selectedIncident.id;
 
@@ -113,10 +138,10 @@ export function IncidentsShell() {
                         );
                       }
                     }}
-                    className={`w-full rounded-[24px] border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(122,145,255,0.72)] focus-visible:ring-inset ${
+                    className={`w-full rounded-[24px] border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(89,175,255,0.72)] focus-visible:ring-inset ${
                       active
                         ? getDrawerAccent(incident.severity)
-                        : "border-white/8 bg-white/[0.03] hover:border-white/16 hover:bg-white/[0.05]"
+                        : "border-white/8 bg-white/[0.03] hover:border-white/16 hover:bg-[linear-gradient(90deg,rgba(77,122,255,0.06),rgba(255,255,255,0.02))]"
                     }`}
                     type="button"
                   >
@@ -125,7 +150,7 @@ export function IncidentsShell() {
                       <StatusPill label={incident.status} />
                     </div>
                     <div className="font-medium text-white">{incident.title}</div>
-                    <div className="mt-2 text-sm leading-6 text-white/48">{incident.summary}</div>
+                    <div className="mt-2 line-clamp-2 text-sm leading-6 text-white/48">{incident.summary}</div>
                     <div className="mt-3 text-xs text-white/30">
                       Updated {incident.updatedAt} · Commander {incident.commander}
                     </div>
@@ -138,14 +163,14 @@ export function IncidentsShell() {
           <ResizableHandle withHandle />
 
           <ResizablePanel defaultSize={60} minSize={42}>
-            <div className="h-full border-l border-white/8 p-5">
+            <div className="h-full overflow-y-auto border-l border-white/8 p-5">
               <div className={`rounded-[30px] border p-5 ${getDrawerAccent(selectedIncident.severity)}`}>
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-                  <div>
+                  <div className="min-w-0">
                     <div className="text-[11px] font-semibold tracking-[0.18em] text-white/34 uppercase">
                       Incident detail
                     </div>
-                    <h2 className="mt-2 font-display text-3xl font-semibold tracking-[-0.04em] text-white">
+                    <h2 className="mt-2 break-words font-display text-3xl font-semibold tracking-[-0.04em] text-white">
                       {selectedIncident.title}
                     </h2>
                   </div>
@@ -158,6 +183,15 @@ export function IncidentsShell() {
                 <p className="max-w-3xl text-sm leading-7 text-white/58">
                   {selectedIncident.impactStatement}
                 </p>
+                {latestTimelineEvent ? (
+                  <div className="mt-4 rounded-[22px] border border-white/8 bg-black/18 px-4 py-3">
+                    <div className="text-[11px] font-semibold tracking-[0.18em] text-white/30 uppercase">
+                      Latest update
+                    </div>
+                    <div className="mt-2 text-sm text-white">{latestTimelineEvent.label}</div>
+                    <div className="mt-1 text-sm leading-6 text-white/48">{latestTimelineEvent.detail}</div>
+                  </div>
+                ) : null}
 
                 <div className="mt-5 grid gap-3 md:grid-cols-4">
                   <MetaCard label="Started" value={selectedIncident.startedAt} />
@@ -200,6 +234,32 @@ export function IncidentsShell() {
                       ))}
                     </div>
                   </SurfacePanel>
+
+                  <SurfacePanel
+                    description="The response desk keeps the next investigative moves one click away instead of forcing a context reset."
+                    title="Response pivots"
+                  >
+                    <div className="space-y-3">
+                      <Button asChild className="w-full justify-between rounded-[18px]" variant="secondary">
+                        <Link href={serviceFocusHref}>
+                          Impacted service posture
+                          <ArrowUpRight className="size-4" />
+                        </Link>
+                      </Button>
+                      <Button asChild className="w-full justify-between rounded-[18px]" variant="secondary">
+                        <Link href={traceFocusHref}>
+                          Trace explorer slice
+                          <ArrowUpRight className="size-4" />
+                        </Link>
+                      </Button>
+                      <Button asChild className="w-full justify-between rounded-[18px]" variant="ghost">
+                        <Link href={logsFocusHref}>
+                          Correlated logs
+                          <ArrowUpRight className="size-4" />
+                        </Link>
+                      </Button>
+                    </div>
+                  </SurfacePanel>
                 </div>
 
                 <SurfacePanel
@@ -234,19 +294,22 @@ export function IncidentsShell() {
 function SummaryCard({
   icon,
   label,
+  supporting,
   value,
 }: {
   icon: React.ReactNode;
   label: string;
+  supporting: string;
   value: string;
 }) {
   return (
     <div className="surface-panel rounded-[24px] border border-white/10 p-4">
-      <div className="mb-3 flex items-center gap-2 text-sm text-white/40">
+      <div className="mb-2 flex items-center gap-2 text-sm text-white/40">
         <span className="text-white/32">{icon}</span>
         <span>{label}</span>
       </div>
-      <div className="font-display text-3xl font-semibold tracking-[-0.04em] text-white">{value}</div>
+      <div className="font-display text-[2rem] font-semibold tracking-[-0.04em] text-white capitalize">{value}</div>
+      <div className="mt-1 text-sm text-white/42">{supporting}</div>
     </div>
   );
 }

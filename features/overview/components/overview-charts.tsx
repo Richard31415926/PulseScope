@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   Area,
   AreaChart,
@@ -78,6 +79,20 @@ function DeltaTag({
   );
 }
 
+function useChartReady() {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      setReady(true);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  return ready;
+}
+
 export function LatencyChartPanel({
   compareMode,
   timeline,
@@ -85,6 +100,7 @@ export function LatencyChartPanel({
   compareMode: boolean;
   timeline: OverviewTimelinePoint[];
 }) {
+  const chartReady = useChartReady();
   const latest = timeline.at(-1);
   const previous = timeline.at(-2) ?? latest;
 
@@ -112,64 +128,68 @@ export function LatencyChartPanel({
       }
       title="Latency"
     >
-      <div className="h-[320px]">
-        <ResponsiveContainer height="100%" width="100%">
-          <LineChart data={timeline}>
-            <defs>
-              <linearGradient id="latency-grid" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stopColor="rgba(112,130,255,0.18)" />
-                <stop offset="100%" stopColor="rgba(112,130,255,0)" />
-              </linearGradient>
-            </defs>
-            <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
-            <XAxis axisLine={false} className={axisClassName} dataKey="label" tickLine={false} />
-            <YAxis axisLine={false} className={axisClassName} tickFormatter={(value) => `${value}ms`} tickLine={false} width={56} />
-            <Tooltip
-              content={<ChartTooltip formatter={(value) => `${value}ms`} />}
-              cursor={{ stroke: "rgba(255,255,255,0.1)", strokeDasharray: "4 4" }}
-            />
-            {compareMode ? (
-              <>
-                <Line
-                  dataKey="compareLatencyP95"
-                  dot={false}
-                  name="P95 compare"
-                  opacity={0.45}
-                  stroke="#8ca2ff"
-                  strokeDasharray="6 4"
-                  strokeWidth={2}
-                  type="monotone"
-                />
-                <Line
-                  dataKey="compareLatencyP99"
-                  dot={false}
-                  name="P99 compare"
-                  opacity={0.32}
-                  stroke="#5bbcff"
-                  strokeDasharray="6 4"
-                  strokeWidth={2}
-                  type="monotone"
-                />
-              </>
-            ) : null}
-            <Line
-              dataKey="latencyP95"
-              dot={false}
-              name="P95"
-              stroke="#8ca2ff"
-              strokeWidth={3}
-              type="monotone"
-            />
-            <Line
-              dataKey="latencyP99"
-              dot={false}
-              name="P99"
-              stroke="#5bbcff"
-              strokeWidth={2.4}
-              type="monotone"
-            />
-          </LineChart>
-        </ResponsiveContainer>
+      <div className="h-[320px] min-w-0">
+        {chartReady ? (
+          <ResponsiveContainer height="100%" minWidth={0} width="100%">
+            <LineChart data={timeline}>
+              <defs>
+                <linearGradient id="latency-grid" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="rgba(112,130,255,0.18)" />
+                  <stop offset="100%" stopColor="rgba(112,130,255,0)" />
+                </linearGradient>
+              </defs>
+              <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
+              <XAxis axisLine={false} className={axisClassName} dataKey="label" tickLine={false} />
+              <YAxis axisLine={false} className={axisClassName} tickFormatter={(value) => `${value}ms`} tickLine={false} width={56} />
+              <Tooltip
+                content={<ChartTooltip formatter={(value) => `${value}ms`} />}
+                cursor={{ stroke: "rgba(255,255,255,0.1)", strokeDasharray: "4 4" }}
+              />
+              {compareMode ? (
+                <>
+                  <Line
+                    dataKey="compareLatencyP95"
+                    dot={false}
+                    name="P95 compare"
+                    opacity={0.45}
+                    stroke="#8ca2ff"
+                    strokeDasharray="6 4"
+                    strokeWidth={2}
+                    type="monotone"
+                  />
+                  <Line
+                    dataKey="compareLatencyP99"
+                    dot={false}
+                    name="P99 compare"
+                    opacity={0.32}
+                    stroke="#5bbcff"
+                    strokeDasharray="6 4"
+                    strokeWidth={2}
+                    type="monotone"
+                  />
+                </>
+              ) : null}
+              <Line
+                dataKey="latencyP95"
+                dot={false}
+                name="P95"
+                stroke="#8ca2ff"
+                strokeWidth={3}
+                type="monotone"
+              />
+              <Line
+                dataKey="latencyP99"
+                dot={false}
+                name="P99"
+                stroke="#5bbcff"
+                strokeWidth={2.4}
+                type="monotone"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-full rounded-[24px] border border-white/6 bg-white/[0.02]" />
+        )}
       </div>
     </ChartShell>
   );
@@ -182,6 +202,7 @@ export function ThroughputChartPanel({
   compareMode: boolean;
   timeline: OverviewTimelinePoint[];
 }) {
+  const chartReady = useChartReady();
   const latest = timeline.at(-1);
   const previous = timeline.at(-2) ?? latest;
 
@@ -201,50 +222,54 @@ export function ThroughputChartPanel({
       }
       title="Throughput"
     >
-      <div className="h-[240px]">
-        <ResponsiveContainer height="100%" width="100%">
-          <AreaChart data={timeline}>
-            <defs>
-              <linearGradient id="throughput-fill" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stopColor="rgba(90,182,255,0.32)" />
-                <stop offset="100%" stopColor="rgba(90,182,255,0.03)" />
-              </linearGradient>
-            </defs>
-            <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
-            <XAxis axisLine={false} className={axisClassName} dataKey="label" tickLine={false} />
-            <YAxis
-              axisLine={false}
-              className={axisClassName}
-              tickFormatter={(value) => formatCompactNumber(value)}
-              tickLine={false}
-              width={56}
-            />
-            <Tooltip
-              content={<ChartTooltip formatter={(value) => `${formatCompactNumber(value)} rpm`} />}
-              cursor={{ stroke: "rgba(255,255,255,0.1)", strokeDasharray: "4 4" }}
-            />
-            <Area
-              dataKey="throughput"
-              fill="url(#throughput-fill)"
-              name="Current window"
-              stroke="#58b8ff"
-              strokeWidth={2.5}
-              type="monotone"
-            />
-            {compareMode ? (
-              <Line
-                dataKey="compareThroughput"
-                dot={false}
-                name="Compare window"
-                opacity={0.42}
-                stroke="#b8d7ff"
-                strokeDasharray="6 4"
-                strokeWidth={2}
+      <div className="h-[240px] min-w-0">
+        {chartReady ? (
+          <ResponsiveContainer height="100%" minWidth={0} width="100%">
+            <AreaChart data={timeline}>
+              <defs>
+                <linearGradient id="throughput-fill" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="rgba(90,182,255,0.32)" />
+                  <stop offset="100%" stopColor="rgba(90,182,255,0.03)" />
+                </linearGradient>
+              </defs>
+              <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
+              <XAxis axisLine={false} className={axisClassName} dataKey="label" tickLine={false} />
+              <YAxis
+                axisLine={false}
+                className={axisClassName}
+                tickFormatter={(value) => formatCompactNumber(value)}
+                tickLine={false}
+                width={56}
+              />
+              <Tooltip
+                content={<ChartTooltip formatter={(value) => `${formatCompactNumber(value)} rpm`} />}
+                cursor={{ stroke: "rgba(255,255,255,0.1)", strokeDasharray: "4 4" }}
+              />
+              <Area
+                dataKey="throughput"
+                fill="url(#throughput-fill)"
+                name="Current window"
+                stroke="#58b8ff"
+                strokeWidth={2.5}
                 type="monotone"
               />
-            ) : null}
-          </AreaChart>
-        </ResponsiveContainer>
+              {compareMode ? (
+                <Line
+                  dataKey="compareThroughput"
+                  dot={false}
+                  name="Compare window"
+                  opacity={0.42}
+                  stroke="#b8d7ff"
+                  strokeDasharray="6 4"
+                  strokeWidth={2}
+                  type="monotone"
+                />
+              ) : null}
+            </AreaChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-full rounded-[24px] border border-white/6 bg-white/[0.02]" />
+        )}
       </div>
     </ChartShell>
   );
@@ -257,6 +282,7 @@ export function ErrorRateChartPanel({
   compareMode: boolean;
   timeline: OverviewTimelinePoint[];
 }) {
+  const chartReady = useChartReady();
   const latest = timeline.at(-1);
   const previous = timeline.at(-2) ?? latest;
 
@@ -276,44 +302,48 @@ export function ErrorRateChartPanel({
       }
       title="Error rate"
     >
-      <div className="h-[240px]">
-        <ResponsiveContainer height="100%" width="100%">
-          <LineChart data={timeline}>
-            <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
-            <XAxis axisLine={false} className={axisClassName} dataKey="label" tickLine={false} />
-            <YAxis
-              axisLine={false}
-              className={axisClassName}
-              tickFormatter={(value) => `${value}%`}
-              tickLine={false}
-              width={48}
-            />
-            <Tooltip
-              content={<ChartTooltip formatter={(value) => formatPercentage(value)} />}
-              cursor={{ stroke: "rgba(255,255,255,0.1)", strokeDasharray: "4 4" }}
-            />
-            {compareMode ? (
+      <div className="h-[240px] min-w-0">
+        {chartReady ? (
+          <ResponsiveContainer height="100%" minWidth={0} width="100%">
+            <LineChart data={timeline}>
+              <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
+              <XAxis axisLine={false} className={axisClassName} dataKey="label" tickLine={false} />
+              <YAxis
+                axisLine={false}
+                className={axisClassName}
+                tickFormatter={(value) => `${value}%`}
+                tickLine={false}
+                width={48}
+              />
+              <Tooltip
+                content={<ChartTooltip formatter={(value) => formatPercentage(value)} />}
+                cursor={{ stroke: "rgba(255,255,255,0.1)", strokeDasharray: "4 4" }}
+              />
+              {compareMode ? (
+                <Line
+                  dataKey="compareErrorRate"
+                  dot={false}
+                  name="Compare window"
+                  opacity={0.42}
+                  stroke="#ffb8b8"
+                  strokeDasharray="6 4"
+                  strokeWidth={2}
+                  type="monotone"
+                />
+              ) : null}
               <Line
-                dataKey="compareErrorRate"
+                dataKey="errorRate"
                 dot={false}
-                name="Compare window"
-                opacity={0.42}
-                stroke="#ffb8b8"
-                strokeDasharray="6 4"
-                strokeWidth={2}
+                name="Current window"
+                stroke="#ff7c7c"
+                strokeWidth={2.6}
                 type="monotone"
               />
-            ) : null}
-            <Line
-              dataKey="errorRate"
-              dot={false}
-              name="Current window"
-              stroke="#ff7c7c"
-              strokeWidth={2.6}
-              type="monotone"
-            />
-          </LineChart>
-        </ResponsiveContainer>
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-full rounded-[24px] border border-white/6 bg-white/[0.02]" />
+        )}
       </div>
     </ChartShell>
   );

@@ -21,15 +21,20 @@ export function ServiceDependencyPanorama({
     <div className="space-y-3">
       {featured.map((service) => (
         <div
-          className="rounded-[24px] border border-white/8 bg-white/[0.03] p-4"
+          className="rounded-[24px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.015))] p-4"
           key={service.id}
         >
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <div>
-              <div className="font-medium text-white">{service.name}</div>
+          <div className="mb-3 flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="truncate font-medium text-white">{service.name}</div>
               <div className="mt-1 text-sm text-white/42">{service.owner}</div>
             </div>
             <HealthIndicator compact status={service.status} />
+          </div>
+
+          <div className="mb-3 grid gap-2 sm:grid-cols-2">
+            <MetricPill label="Dependencies" value={`${service.dependencies.length}`} />
+            <MetricPill label="Availability" value={service.availability} />
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -47,6 +52,15 @@ export function ServiceDependencyPanorama({
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+function MetricPill({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-[18px] border border-white/8 bg-black/14 px-3 py-2">
+      <div className="text-[10px] font-semibold tracking-[0.18em] text-white/30 uppercase">{label}</div>
+      <div className="mt-1 text-sm font-medium text-white">{value}</div>
     </div>
   );
 }
